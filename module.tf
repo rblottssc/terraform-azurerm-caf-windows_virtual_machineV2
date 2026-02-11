@@ -31,7 +31,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
   priority                                               = try(var.windows_VM.priority, "Regular")
   provision_vm_agent                                     = try(var.windows_VM.provision_vm_agent, true)
   proximity_placement_group_id                           = try(var.windows_VM.proximity_placement_group_id, null)
-  reboot_setting                                         = try(var.windows_VM.reboot_setting, "Never")
+  reboot_setting                                         = try(var.windows_VM.patch_mode, null) == "AutomaticByPlatform" ? try(var.windows_VM.reboot_setting, "Never") : null
   secure_boot_enabled                                    = try(var.windows_VM.secure_boot_enabled, false)
   source_image_id                                        = try(var.windows_VM.source_image_id, null)
   timezone                                               = try(var.windows_VM.timezone, "UTC-11")
