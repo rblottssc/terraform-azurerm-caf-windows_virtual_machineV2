@@ -19,6 +19,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
   dedicated_host_group_id                                = try(var.windows_VM.dedicated_host_group_id, null)
   edge_zone                                              = try(var.windows_VM.edge_zone, null)
   disk_controller_type                                   = try(var.windows_VM.disk_controller_type, null)
+  enable_automatic_updates                               = false
   encryption_at_host_enabled                             = try(var.windows_VM.encryption_at_host_enabled, null)
   eviction_policy                                        = try(var.windows_VM.eviction_policy, null)
   extensions_time_budget                                 = try(var.windows_VM.extensions_time_budget, "PT1H30M")
