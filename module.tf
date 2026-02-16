@@ -45,7 +45,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
     name                      = "${local.vm-name}-osdisk1"
     caching                   = try(var.windows_VM.os_disk.caching, "ReadWrite")
     storage_account_type      = try(var.windows_VM.os_disk.storage_account_type, "Standard_LRS")
-    disk_size_gb              = try(var.windows_VM.os_disk.disk_size_gb, null)
+    disk_size_gb              = try(var.windows_VM.os_disk.disk_size_gb, 128) # Default size for OS Disk is 128 on the default image, CIS curiously set it to 30GB and it breaks updates
     write_accelerator_enabled = try(var.windows_VM.write_accelerator_enabled, false)
   }
 
