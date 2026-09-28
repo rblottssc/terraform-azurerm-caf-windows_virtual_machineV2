@@ -7,13 +7,27 @@ windows_VMs = {
     # admin_password          = "Canada123!"                          # Optional: Only set the password if a generated password cannot be created. See README for details
     vm_size = "Standard_D2s_v5"
 
-    backup_policy = "daily1" # Optional: Set this value to configure backup policy on the VM. Can be either userDefinedString portion of the policy name or ID. Defaults to daily1 
-    # disable_backup           = false                                                                             # Optional: Set this value to true if you want to disable backups on this VM    
-    enable_automatic_updates = true                  # (Optional) Specifies if Automatic Updates are Enabled for the Windows Virtual Machine. Changing this forces a new resource to be created.
-    patch_assessment_mode    = "AutomaticByPlatform" # force settings to AutomaticByPlatform for UMC OS patching 
-    patch_mode               = "AutomaticByPlatform" # force settings to AutomaticByPlatform for UMC OS patching 
+    backup_policy = "daily1" # Optional: name or ARM resource ID of the backup policy.
+    #   Regular VMs: accepts a name (resolved to ARM ID via data source) or a full ARM ID
+    #   jump_server = true:  MUST be a full ARM resource ID — no data source lookup is performed
+    # disable_backup = false  # Optional: Set to true to skip backup entirely
+    # jump_server    = false  # Optional: Set to true to skip backup data-source lookup; backup_policy must then be a full ARM ID
 
-    custom_data                                              = "install-ca-certs"
+    # Optional: fine-grained backup disk filtering (sub-block, requires disable_backup = false)
+    # backup = {
+    #   exclude_disk_luns = []   # LUNs to exclude from backup
+    #   include_disk_luns = []   # LUNs to include in backup (mutually exclusive with exclude)
+    #   protection_state  = ""   # e.g. "ProtectionStopped"
+    # }
+
+    automatic_updates_enabled = true                  # (Optional) Controls Windows automatic updates (valid in azurerm 4.x and 5.x). Use instead of or alongside enable_automatic_updates.
+    patch_assessment_mode     = "AutomaticByPlatform" # force settings to AutomaticByPlatform for UMC OS patching 
+    patch_mode                = "AutomaticByPlatform" # force settings to AutomaticByPlatform for UMC OS patching 
+
+    custom_data = "install-ca-certs"
+    # vm_name                                                = ""  # Optional: Override the auto-generated VM name (default: {env4}{serverType3}-{userDefinedString7})
+    # nsg_name                                               = ""  # Optional: Override the auto-generated NSG name (default: <vm-name>-nsg; only relevant when use_nic_nsg = true)
+    # kv_secret_name                                         = ""  # Optional: Override the Key Vault secret name used to store the generated admin password (default: <vm-name>-vm-admin-password)
     # computer_name                                          = "Example"                                           # Optional: Set this if you need the guest OS Hostname to be different than the Azure resource name
     # user_data                                              = "post_install_scripts/ubuntu/post_install.sh"       # Optional: Set this value with the relative path to the file from your CWD.
     # boot_diagnostic                                        = true
@@ -38,11 +52,11 @@ windows_VMs = {
     # proximity_placement_group_id                           = ""
     # reboot_setting                                         = "Never"
     # secure_boot_enabled                                    = false
-    # source_image_id                                        = ""
+    # source_image_id                                        = ""  # Provide an image ID instead of storage_image_reference; when set, the storage_image_reference block is ignored
     # timezone                                               = "UTC-11"
     # virtual_machine_scale_set_id                           = ""
-    # vm_agent_platform_updates_enabled                      = false
     # vtpm_enabled                                           = ""
+    # write_accelerator_enabled                              = false  # Top-level; enables write accelerator on the OS disk (requires Premium storage + caching=None)
     # zone                                                   = ""
 
     # At least one nic is required. If more than one is present, the first nic in the list will be the primary one.
@@ -52,6 +66,8 @@ windows_VMs = {
         private_ip_address_allocation = "Static"
         private_ip_address            = "172.17.65.8"
 
+        # name                           = ""  # Optional: Override the auto-generated NIC name (default: <vm-name>-nicN)
+        # ip_configuration_name          = ""  # Optional: Override the default IP configuration name (default: <vm-name>-ipconfigN)
         # dns_servers                    = []
         # edge_zone                      = ""
         # ip_forwarding_enabled          = false
@@ -69,10 +85,10 @@ windows_VMs = {
 
     # Optional: Uncomment if you need to configure os_disk with different defaults than below. Only supports one os_disk
     # os_disk = {
-    #   caching                   = "ReadWrite"
-    #   storage_account_type      = "Standard_LRS"
-    #   disk_size_gb              = 128
-    #   write_accelerator_enabled = false
+    #   caching              = "ReadWrite"
+    #   storage_account_type = "StandardSSD_LRS"
+    #   disk_size_gb         = 128
+    #   # name               = ""  # Optional: Override the auto-generated OS disk name (default: <vm-name>-osdisk1)
     # }
 
     # Optional: Uncomment and configure data disks for the VM. Can create more than one data disks.
@@ -83,6 +99,7 @@ windows_VMs = {
     #     disk_size_gb         = 500
     #     lun                  = 0
     #     caching              = "ReadWrite"
+    #     # name               = ""  # Optional: Override the auto-generated data disk name (default: <vm-name>-datadiskN where N = lun+1)
     #     # disk_iops_read_write                 = null
     #     # disk_mbps_read_write                 = null
     #     # disk_iops_read_only                  = null
@@ -137,7 +154,7 @@ windows_VMs = {
     # }
 
     # Optional: Uncomment this block to set a key vault where the TF generated password will be. Default is KV in the project subscription.
-    # key_vault = {
+    # keyvault = {
     #   name = ""
     #   resource_group_name = "Keyvault"
     # }
